@@ -1,5 +1,4 @@
 # Flappy Bird (Java)
-
 🚧 **v1 — work in progress.**
 
 This release is backend logic plus a throwaway test harness to make sure it all works. The real frontend is being built separately by my partner Hassan and will land in a future release.
@@ -52,3 +51,7 @@ Needs the JavaFX SDK (not bundled with the JDK). Add to your run config:
 ```
 
 Run `FlappyBirdApp.main()`.
+## Contributors: 
+- Amr ( Backend and game logic )
+- Claude (Frontend)
+-  AlphaTesterAnas ( Tester ) 
