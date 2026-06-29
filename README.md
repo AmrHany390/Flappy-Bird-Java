@@ -1,57 +1,52 @@
-# Flappy Bird (Java)
-🚧 **v1 — work in progress.**
+# 🐦 Flappy Bird - JavaFX Edition
 
-This release is backend logic plus a throwaway test harness to make sure it all works. The real frontend is being built separately by my partner Hassan and will land in a future release.
+A fully playable, from-scratch recreation of the classic Flappy Bird game built using Java and JavaFX. 
 
-## Quick start
+This project features a custom physics engine, smooth sprite animations, and a highly optimized game loop designed to run flawlessly even in fullscreen mode. 
 
-Download `FlappyBird.zip` from this repo, extract it, then run the `.exe` inside — no JDK or JavaFX setup needed, everything's bundled in.
+## ✨ Features
 
-**Controls**
+* **Custom Physics Engine:** Realistic gravity, jump velocity, and collision detection built entirely from scratch.
+* **Dynamic Hitbox Scaling:** The game window is completely resizable. The backend physics calculate the aspect ratio in real-time so the hitboxes perfectly match the visual sprites at any resolution.
+* **Zero-Allocation Game Loop:** Optimized to prevent Java Garbage Collection spikes. All hitboxes and collision objects are cached and reused, resulting in buttery-smooth, lag-free gameplay.
+* **Full UI Integration:** Features a Main Menu, Game Over overlay, and a Settings screen with a working volume slider.
+* **Sprite Animations:** Parallax scrolling clouds and ground, alongside a bird sprite that dynamically tilts and changes based on its current velocity.
+* **Soundtrack:** Integrated background music using JavaFX `MediaPlayer`.
 
-| Action | Key |
-|---|---|
-| Jump | `Space` or click |
-| Restart (after game over) | `R` or click |
+## 🛠️ Tech Stack
 
-## What's in this version
+* **Language:** Java
+* **GUI Framework:** JavaFX (`Canvas` API for rendering)
+* **Architecture:** Object-Oriented Programming (OOP) with a strict separation between frontend rendering and backend logic.
 
-- `Bird`, `Pipe`, `Board` — the full game logic, no UI dependencies at all
-- `FlappyBirdApp` — a bare-bones JavaFX window used to playtest the backend (gravity feel, collisions, scoring, spawn timing). **Not the real frontend** — just rectangles and a circle on a canvas, built to verify the logic works before handing it off.
+## 🚀 How to Run
 
-## Coming in later releases
+1. Make sure you have the **Java Development Kit (JDK)** and **JavaFX SDK** installed (version 11 or higher recommended).
+2. Clone this repository:
+   ```bash
+   git clone [https://github.com/](https://github.com/)[YourUsername]/FlappyBird-JavaFX.git
+   ```
+3. Open the project in your preferred IDE (IntelliJ IDEA, Eclipse, etc.).
+4. Ensure the `assets` folder (containing the PNG sprites, TTF font, and MP3 music) is properly set in your resources directory.
+5. Add the JavaFX VM options to your run configuration (if required by your IDE):
+   ```bash
+   --module-path /path/to/javafx/lib --add-modules javafx.controls,javafx.media
+   ```
+6. Run `FlappyBirdApp.java`!
 
-- Real frontend/UI (Hassan)
-- Sprites, animations, sound
-- Polished menus, restart flow, possibly difficulty scaling
+## 🎮 Controls
 
-## Classes
+* **SPACEBAR:** Jump / Flap
 
-**`Bird`** — tracks vertical position and velocity, applies gravity each frame, handles the jump impulse.
-- `update()` — applies gravity, moves the bird
-- `jump()` — upward velocity kick
-- `getBounds()` — hitbox for collisions
+## 👥 Contributors:
 
-**`Pipe`** — one pipe pair (top + bottom) with a gap, scrolls left each frame.
-- `update()` — moves left
-- `isOffScreen()` — true once fully past the left edge
-- `getTopBounds()` / `getBottomBounds()` — hitboxes
-- `isScored()` / `setScored(boolean)` — whether this pipe has already counted toward the score
+This project was a collaborative effort, split cleanly between graphics and physics:
 
-**`Board`** — owns the bird and the pipe list, runs one frame of logic per `update()` call: movement, collisions, cleanup, scoring, spawning.
-- `update()` — advances one frame; no-ops once the game is over
-- `getScore()` / `isGameOver()` / `getPipes()`
-
-## Running from source
-
-Needs the JavaFX SDK (not bundled with the JDK). Add to your run config:
-
-```
---module-path "/path/to/javafx-sdk/lib" --add-modules javafx.controls,javafx.fxml
-```
-
-Run `FlappyBirdApp.main()`.
-## Contributors: 
-- Amr ( Backend and game logic )
-- Claude (Frontend)
--  AlphaTesterAnas ( Tester ) 
+* **Backend Development:** Amr [github.com/AmrHany390]
+  * *Responsible for the custom physics engine, game loop memory optimization, collision math, and dynamic hitbox scaling.*
+* **Frontend Development:** Hassan [github.com/UpLightt]
+  * *Responsible for the JavaFX UI, Canvas rendering, sprite animations, and menu layouts.*
+* **Testing:** Anas [github.com/AlphaTesterAnas]
+  * *Responsible for testing the game and looking for bugs in it's early stages*
+* **Music:** Laufey 
+  * *The amazing soundtrack*
