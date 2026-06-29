@@ -7,7 +7,7 @@ public class Bird {
     private final double GRAVITY = 0.0002;
     private final double birdSize = 0.08;
 
-    // -> FIX: Create the rectangle ONCE in memory
+
     private Rectangle2D.Double hitbox = new Rectangle2D.Double();
 
     public void jump() {
@@ -17,6 +17,7 @@ public class Bird {
     public void update() {
         velocity += GRAVITY;
         y += velocity;
+        
     }
 
     public double getX() { return x; }
@@ -27,10 +28,10 @@ public class Bird {
     public Rectangle2D getBounds(double aspectRatio) {
         double hitWidth = (birdSize / aspectRatio);
         double hitHeight = birdSize;
-        double shrinkX = hitWidth * 0.85;
-        double shrinkY = hitHeight * 0.85;
+        double shrinkX = hitWidth * 0.8;
+        double shrinkY = hitHeight * 0.8;
 
-        // -> FIX: Update the existing rectangle instead of creating a new one
+
         hitbox.setRect(
                 x + (shrinkX / 2),
                 y + (shrinkY / 2),

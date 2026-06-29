@@ -63,7 +63,8 @@ public class Board {
                 gameOver = true;
             }
         }
-        if (bird.getY() > 1.0 || bird.getY() < 0) gameOver = true;
+        if (bird.getY() > 1.0 || bird.getY() < 0.0003799999999999626
+        ) gameOver = true;
     }
 
 

@@ -25,11 +25,16 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 public class FlappyBirdApp extends Application {
+
+    private final SaveData saveData = new SaveData();
     private MediaPlayer mediaPlayer;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Media media = new Media(getClass().getResource("/assets/From The Start (Instrumental).mp3").toURI().toString());
         mediaPlayer = new MediaPlayer(media);
+        saveData.load();
+        mediaPlayer.setVolume(saveData.volume);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.play();
         primaryStage.setTitle("Flappy Bird");
@@ -92,6 +97,22 @@ public class FlappyBirdApp extends Application {
 
         // --- animation loop ---
         AnimationTimer[] timer = {null};
+        startBackgroundAnimation(canvas, gc, cloudImg, groundImg,
+                clouds, cloudSpawnTimer, groundX, groundSpeed, timer);
+
+        // stop animation when leaving this scene
+        stage.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != scene) timer[0].stop();
+        });
+
+        return scene;
+    }
+
+    private void startBackgroundAnimation(Canvas canvas, GraphicsContext gc,
+                                          Image cloudImg, Image groundImg,
+                                          List<Cloud> clouds, double[] cloudSpawnTimer,
+                                          double[] groundX, double groundSpeed,
+                                          AnimationTimer[] timer) {
         timer[0] = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -101,11 +122,9 @@ public class FlappyBirdApp extends Application {
                 double groundY = H - groundH;
                 double tileW = groundH * (groundImg.getWidth() / groundImg.getHeight());
 
-                // background
                 gc.setFill(Color.web("#ADD8E6"));
                 gc.fillRect(0, 0, W, H);
 
-                // clouds
                 cloudSpawnTimer[0] += 0.016;
                 if (cloudSpawnTimer[0] > 5) {
                     clouds.add(new Cloud(W, H));
@@ -117,7 +136,6 @@ public class FlappyBirdApp extends Application {
                 }
                 clouds.removeIf(c -> c.x + c.width < 0);
 
-                // ground
                 groundX[0] -= groundSpeed;
                 if (groundX[0] <= -tileW) groundX[0] += tileW;
                 for (double x = groundX[0]; x < W; x += tileW) {
@@ -126,47 +144,65 @@ public class FlappyBirdApp extends Application {
             }
         };
         timer[0].start();
-
-        // stop animation when leaving this scene
-        stage.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != scene) timer[0].stop();
-        });
-
-        return scene;
     }
 
     private Scene buildSettingsScene(Stage stage) {
-        // title at top
-        Label titleLabel = buildLabel("SETTINGS", 40);
+        Canvas canvas = new Canvas();
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        Image cloudImg  = new Image(getClass().getResourceAsStream("/assets/Cloud.png"));
+        Image groundImg = new Image(getClass().getResourceAsStream("/assets/Ground.png"));
+
+        List<Cloud> clouds = new ArrayList<>();
+        double[] cloudSpawnTimer = {0};
+        double[] groundX = {0};
+
+        // title
+        Label titleLabel = buildLabel("SETTINGS", 30);
         VBox titleBox = new VBox(titleLabel);
         titleBox.setAlignment(Pos.TOP_CENTER);
         titleBox.setPadding(new Insets(40, 0, 0, 0));
 
-        // volume slider in center
+        // volume
         Label volumeLabel = buildLabel("VOLUME", 16);
-        Slider volumeSlider = new Slider(0, 1, mediaPlayer.getVolume());
+        Slider volumeSlider = new Slider(0, 1, saveData.volume);
         volumeSlider.setMaxWidth(200);
         volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             mediaPlayer.setVolume(newVal.doubleValue());
+            saveData.volume = newVal.doubleValue();
+            saveData.save();
         });
 
         VBox centerBox = new VBox(15, volumeLabel, volumeSlider);
         centerBox.setAlignment(Pos.CENTER);
 
-        // back button bottom left
+        // back button
         Button backBtn = buildMenuButton("BACK", 155);
         backBtn.setOnAction(e -> stage.setScene(buildStartScene(stage)));
 
-        BorderPane root = new BorderPane();
-        root.setTop(titleBox);
-        root.setCenter(centerBox);
-        root.setBottom(backBtn);
-        BorderPane.setMargin(backBtn, new Insets(0, 0, 30, 30));
-        root.setStyle("-fx-background-color: black;");
+        VBox bottomLeft = new VBox(backBtn);
+        bottomLeft.setAlignment(Pos.BOTTOM_LEFT);
+        bottomLeft.setPadding(new Insets(0, 0, 30, 30));
+        bottomLeft.setPickOnBounds(false);
+
+        StackPane root = new StackPane(canvas, titleBox, centerBox, bottomLeft);
 
         double w = stage.getWidth();
         double h = stage.getHeight();
-        return new Scene(root, w, h);
+        Scene scene = new Scene(root, w, h);
+
+        canvas.widthProperty().bind(scene.widthProperty());
+        canvas.heightProperty().bind(scene.heightProperty());
+
+        AnimationTimer[] timer = {null};
+        startBackgroundAnimation(canvas, gc, cloudImg, groundImg,
+                clouds, cloudSpawnTimer, groundX, 1.5, timer);
+
+        stage.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != scene) timer[0].stop();
+        });
+
+        return scene;
     }
 
     private Scene buildGameScene(Stage stage) {
@@ -206,6 +242,11 @@ public class FlappyBirdApp extends Application {
         });
 
         boolean[] gameOverHandled = {false};
+        boolean[] scoreNotTheSame = {true};
+        Label score = buildLabel("Score: " + board.getScore(), 15);
+        VBox scoreBox = new VBox(score);
+        scoreBox.setPadding(new Insets(10, 0, 0, 10));
+        root.getChildren().add(scoreBox);
 
         AnimationTimer[] timer = {null};
         timer[0] = new AnimationTimer() {
@@ -291,35 +332,36 @@ public class FlappyBirdApp extends Application {
                 }
 
                 // Score
-                gc.setFill(Color.WHITE);
-                gc.fillText("Score: " + board.getScore(), W * 0.05, H * 0.07);
-
-
-
+                score.setText("Score: " + board.getScore());
 
                 // --- 3. GAME OVER OVERLAY (Draw the dim effect constantly) ---
                 if (isGameOver) {
-                    // Because the timer is still running, we must draw the dark rectangle every frame
                     gc.setFill(Color.rgb(0, 0, 0, 0.5));
                     gc.fillRect(0, 0, W, H);
 
-                    // Add the UI elements only once
                     if (!gameOverHandled[0]) {
                         gameOverHandled[0] = true;
 
-                        // NOTE: I removed timer[0].stop() from here!
+                        //Save high-score
+
+                        if (board.getScore() > saveData.highScore) {
+                            saveData.highScore = board.getScore();
+                            saveData.save();
+                        }
 
                         Platform.runLater(() -> {
                             Label title = buildLabel("GAME OVER", 40);
                             Button restartBtn = buildMenuButton("RESTART", 210);
                             Button quitBtn = buildMenuButton("QUIT", 210);
-                            Button menuBtn = buildMenuButton("MAIN MENU", 210);
+                            Button menuBtn = buildMenuButton("MAIN MENU", 245);
+                            Label highScoreLabel = buildLabel("BEST: " + saveData.highScore, 18);
+                            highScoreLabel.setPadding(new Insets(20, 0, 0, 0));
 
                             restartBtn.setOnAction(e -> stage.setScene(buildGameScene(stage)));
                             quitBtn.setOnAction(e -> stage.close());
                             menuBtn.setOnAction(e -> stage.setScene(buildStartScene(stage)));
 
-                            VBox titleBox = new VBox(title);
+                            VBox titleBox = new VBox(title, highScoreLabel);
                             titleBox.setAlignment(Pos.TOP_CENTER);
                             titleBox.setPadding(new Insets(40, 0, 0, 0));
 

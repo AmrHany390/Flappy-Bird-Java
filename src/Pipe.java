@@ -7,7 +7,7 @@ public class Pipe {
     private final double gapHeight;
     private boolean scored = false;
 
-    
+
     private Rectangle2D.Double topBox = new Rectangle2D.Double();
     private Rectangle2D.Double bottomBox = new Rectangle2D.Double();
 
@@ -27,13 +27,13 @@ public class Pipe {
     public void setScored(boolean scored) { this.scored = scored; }
 
     public Rectangle2D getTopBounds() {
-        // -> FIX: Update existing rectangle
+
         topBox.setRect(x, 0, width, gapY);
         return topBox;
     }
 
     public Rectangle2D getBottomBounds() {
-        // -> FIX: Update existing rectangle
+
         bottomBox.setRect(x, gapY + gapHeight, width, 1 - (gapY + gapHeight));
         return bottomBox;
     }
