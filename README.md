@@ -19,12 +19,21 @@ This project features a custom physics engine, smooth sprite animations, and a h
 * **GUI Framework:** JavaFX (`Canvas` API for rendering)
 * **Architecture:** Object-Oriented Programming (OOP) with a strict separation between frontend rendering and backend logic.
 
-## 🚀 How to Run
+
+## 🚀 How to Run ( option 1 )
+
+1. Download the latest release.
+2. Unzip the folder
+3. Run the "Flappy bird" exe.
+4. Enjoy!!
+
+
+## 🚀 How to Run ( option 2 )
 
 1. Make sure you have the **Java Development Kit (JDK)** and **JavaFX SDK** installed (version 11 or higher recommended).
 2. Clone this repository:
    ```bash
-   git clone [https://github.com/](https://github.com/)[YourUsername]/FlappyBird-JavaFX.git
+   git clone [https://github.com/AmrHany390](https://github.com/AmrHany390)[AmrHany390]/FlappyBird-JavaFX.git
    ```
 3. Open the project in your preferred IDE (IntelliJ IDEA, Eclipse, etc.).
 4. Ensure the `assets` folder (containing the PNG sprites, TTF font, and MP3 music) is properly set in your resources directory.
